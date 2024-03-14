@@ -79,6 +79,8 @@ async function createWindow() {
     return { action: 'deny' }
   })
 
+  
+
   // Apply electron-updater
   update(win)
 }

@@ -1,5 +1,24 @@
 import { ipcRenderer, contextBridge } from 'electron'
 
+let { readdir } = require('fs').promises
+
+let directoryContents = async (path: string) => {
+  let results = await readdir(path, {withFileTypes: true})
+  return results.map(entry => ({
+    name: entry.name,
+    type: entry.isDirectory() ? "dir" : "file",
+  }))
+}
+
+let currentDirectory = () => {
+  return process.cwd()
+}
+
+contextBridge.exposeInMainWorld('api', {
+  directoryContents,
+  currentDirectory,
+})
+
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
   on(...args: Parameters<typeof ipcRenderer.on>) {
@@ -21,6 +40,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
 
   // You can expose other APTs you need here.
   // ...
+
 })
 
 // --------- Preload scripts loading ---------
